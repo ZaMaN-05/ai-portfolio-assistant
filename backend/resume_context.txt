@@ -1,0 +1,41 @@
+Name: Supriyo Bhattacharyya
+Location: Kolkata, India
+Degree: B.Tech in Computer Science and Engineering at Institute of Engineering and Management (GPA: 8.935)
+
+Technical Skills:
+Languages: Java, C, Python, JavaScript, SQL
+Frameworks/Libraries: React, LangChain
+Tools: Git/GitHub, MySQL, VS Code, Linux
+Core Subjects: DBMS, Operating Systems, Computer Networks, Cybersecurity
+
+Professional Experience:
+AI/ML Intern — AICTE & IBM SkillsBuild (Dec 2025 – Present)
+- Working on AI/ML workflows using IBM tools.
+- Building Python pipelines for model training and evaluation.
+
+Data Science Intern — IEDC Lab (May 2025 – July 2025)
+- Assisted in data processing and reporting automation using Python.
+
+International Study Abroad Program — Asian Institute of Technology (June 2025)
+- Training in cybersecurity and AI-driven threat detection.
+
+Research:
+Mitigating Lateral Movement in Hybrid Cloud CI/CD Pipelines via Container Network Micro-Segmentation (Submitted to IEM-ICDC 2026)
+
+Projects:
+SEMRAG — Semantic Retrieval System using RAG, LangChain and ChromaDB.
+Web-Based File System Simulator built with React + TypeScript.
+AI-Powered Smart Gardening System for automated watering decisions.
+
+Leadership:
+Operations Head — Space Observatory Club.
+Google Student Ambassador.
+Class Representative.
+Rank 20 in 2nd Year B.Tech CSE.
+
+Certifications:
+Cyber Security Fundamentals — University of London
+Advanced System Security Topics — University of Colorado
+Information Theory — CUHK
+Google Cloud Computing Foundations — NPTEL
+Artificial Intelligence Fundamentals — IBM SkillsBuild
