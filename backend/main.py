@@ -9,7 +9,6 @@ load_dotenv()
 
 app = FastAPI()
 
-# Allow frontend (Vercel) to call backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,6 +18,9 @@ app.add_middleware(
 )
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+with open("resume_context.txt", "r", encoding="utf-8") as f:
+    RESUME_CONTEXT = f.read()
 
 
 class ChatRequest(BaseModel):
@@ -32,37 +34,41 @@ def root():
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": "mistralai/mistral-7b-instruct",
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are a professional AI portfolio assistant answering about Supriyo Bhattacharyya. Structure answers cleanly."
-                    },
-                    {
-                        "role": "user",
-                        "content": request.message
-                    }
-                ],
-            },
-        )
+    prompt = f"""
+You are an AI assistant for Supriyo Bhattacharyya's portfolio website.
 
-        data = response.json()
+RULES:
+- Only use the CV information provided below.
+- Do not invent research papers, companies, publications, or achievements.
+- If information is not present, respond with:
+  "This information is not available in the portfolio."
+- Keep answers concise, structured, and professional.
 
-        # If OpenRouter returns error
-        if "error" in data:
-            return {"reply": f"API Error: {data['error']}"}
+CV DATA:
+{RESUME_CONTEXT}
 
-        reply = data["choices"][0]["message"]["content"]
+User Question:
+{request.message}
+"""
 
-        return {"reply": reply}
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": "openai/gpt-4o-mini",
+            "messages": [
+                {"role": "system", "content": "You are a factual and precise portfolio assistant."},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.2,
+        },
+    )
 
-    except Exception as e:
-        return {"reply": f"Server Error: {str(e)}"}
+    data = response.json()
+
+    return {
+        "reply": data["choices"][0]["message"]["content"]
+    }
