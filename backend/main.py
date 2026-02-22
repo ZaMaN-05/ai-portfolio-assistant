@@ -1,53 +1,68 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-import requests
+from pydantic import BaseModel
 import os
+import requests
+from dotenv import load_dotenv
 
 load_dotenv()
 
 app = FastAPI()
 
+# Allow frontend (Vercel) to call backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-with open("resume_context.txt", "r", encoding="utf-8") as f:
-    resume_context = f.read()
+
+class ChatRequest(BaseModel):
+    message: str
+
+
+@app.get("/")
+def root():
+    return {"message": "Backend running 🚀"}
 
 
 @app.post("/chat")
-async def chat(data: dict):
-    user_message = data["message"]
+def chat(request: ChatRequest):
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "mistralai/mistral-7b-instruct",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a professional AI portfolio assistant answering about Supriyo Bhattacharyya. Structure answers cleanly."
+                    },
+                    {
+                        "role": "user",
+                        "content": request.message
+                    }
+                ],
+            },
+        )
 
-    prompt = f"""
-You are an AI assistant for Supriyo Bhattacharyya's portfolio.
-Answer ONLY using the resume information below.
+        data = response.json()
 
-RESUME:
-{resume_context}
+        # If OpenRouter returns error
+        if "error" in data:
+            return {"reply": f"API Error: {data['error']}"}
 
-User Question:
-{user_message}
-"""
+        reply = data["choices"][0]["message"]["content"]
 
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "model": "deepseek/deepseek-chat",
-            "messages": [
-                {"role": "user", "content": prompt}
-            ]
-        }
-    )
+        return {"reply": reply}
 
-    return response.json()
+    except Exception as e:
+        return {"reply": f"Server Error: {str(e)}"}
