@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import "./App.css";
 
 function App() {
@@ -34,12 +35,6 @@ function App() {
     setLoading(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSubmit();
-    }
-  };
-
   return (
     <div className="container">
       <div className="card">
@@ -56,7 +51,7 @@ function App() {
             placeholder="Ask about my projects, internships, skills..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           />
           <button onClick={handleSubmit}>
             {loading ? "..." : "Submit"}
@@ -67,7 +62,18 @@ function App() {
           {loading && <p>Generating answer...</p>}
 
           {!loading && reply && (
-            <ReactMarkdown>{reply}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                p: ({ children }) => <p style={{ marginBottom: "12px" }}>{children}</p>,
+                strong: ({ children }) => (
+                  <strong style={{ color: "#f39c12" }}>{children}</strong>
+                ),
+                li: ({ children }) => <li style={{ marginBottom: "8px" }}>{children}</li>,
+              }}
+            >
+              {reply}
+            </ReactMarkdown>
           )}
 
           {!loading && !reply && (
