@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import "./App.css";
 
 function App() {
@@ -43,7 +44,6 @@ function App() {
     <div className="container">
       <div className="card">
         <h1>Supriyo Bhattacharyya</h1>
-
         <p className="subtitle">
           AI Systems • Applied Machine Learning • Security Research
         </p>
@@ -58,19 +58,20 @@ function App() {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-
           <button onClick={handleSubmit}>
             {loading ? "..." : "Submit"}
           </button>
         </div>
 
-        <div className="response-box fade-in">
-          {loading ? (
-            <p className="loading-text">Generating answer...</p>
-          ) : reply ? (
-            <p className="reply-text">{reply}</p>
-          ) : (
-            <p className="placeholder-text">
+        <div className="response-box">
+          {loading && <p>Generating answer...</p>}
+
+          {!loading && reply && (
+            <ReactMarkdown>{reply}</ReactMarkdown>
+          )}
+
+          {!loading && !reply && (
+            <p style={{ opacity: 0.5 }}>
               The portfolio assistant will respond here.
             </p>
           )}
